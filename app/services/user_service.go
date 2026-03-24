@@ -14,6 +14,7 @@ type UserService struct {
 
 type IUserService interface {
 	Create(*dto.UserRequest) (dto.UserResponse, error)
+	Index() ([]dto.UserResponse, error)
 }
 
 func NewUserService(repository repositories.IRepositoryRegistry) IUserService {
@@ -23,7 +24,6 @@ func NewUserService(repository repositories.IRepositoryRegistry) IUserService {
 }
 
 func (s UserService) Create(data *dto.UserRequest) (dto.UserResponse, error) {
-
 	user := models.User{
 		UserID:   ulid.Make(),
 		Name:     data.Name,
@@ -45,4 +45,28 @@ func (s UserService) Create(data *dto.UserRequest) (dto.UserResponse, error) {
 		UpdatedAt:   user.UpdatedAt,
 		DeletedAt:   user.DeletedAt,
 	}, err
+}
+
+func (s UserService) Index() ([]dto.UserResponse, error) {
+	users := []models.User{}
+	err := s.repository.GetUserRepository().GetAll(&users)
+
+	var data []dto.UserResponse
+
+	for _, user := range users {
+		data = append(data, dto.UserResponse{
+			UserId: user.UserID,
+			UserRequest: dto.UserRequest{
+				Name:     user.Name,
+				Address:  user.Address,
+				Email:    user.Email,
+				Password: user.Password,
+			},
+			CreatedAt: user.CreatedAt,
+			UpdatedAt: user.UpdatedAt,
+			DeletedAt: user.DeletedAt,
+		})
+	}
+
+	return data, err
 }

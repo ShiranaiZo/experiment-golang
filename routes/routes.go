@@ -22,6 +22,7 @@ func InitRoutes(router *gin.Engine, controller controllers.IControllerRegistry) 
 	})
 
 	group.POST("/users", controller.GetUserController().CreateUser)
+	group.GET("/users", controller.GetUserController().GetUsers)
 
 	// router.GET("/health", healthHandler.HealthCheck)
 	// router.GET("/contacts", contactHandler.GetContacts)

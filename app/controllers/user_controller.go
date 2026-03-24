@@ -19,6 +19,7 @@ type IUserController interface {
 	// Login(*gin.Context)
 	// Logout(*gin.Context)
 	CreateUser(*gin.Context)
+	GetUsers(*gin.Context)
 	// GetUsers(*gin.Context)
 	// GetUser(*gin.Context, string)
 	// EditUser(*gin.Context, string)
@@ -78,9 +79,35 @@ func (c UserController) CreateUser(ctx *gin.Context) {
 	})
 }
 
-// func (c *UserController) GetUsers(ctx *gin.Context) {
+func (c *UserController) GetUsers(ctx *gin.Context) {
+	users, err := c.service.GetUserService().Index()
 
-// }
+	code := http.StatusBadRequest
+	message := http.StatusText(code)
+
+	if err != nil {
+		helpers.HttpResponse(
+			helpers.ParamHTTPResponse{
+				Code:    code,
+				Error:   &err,
+				Message: &message,
+				Ctx:     ctx,
+			},
+		)
+	}
+
+	code = http.StatusOK
+	message = http.StatusText(code)
+
+	helpers.HttpResponse(
+		helpers.ParamHTTPResponse{
+			Code:    code,
+			Message: &message,
+			Data:    users,
+			Ctx:     ctx,
+		},
+	)
+}
 
 // func (c *UserController) GetUser(ctx *gin.Context, id string) {
 
