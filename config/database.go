@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/ShiranaiZo/experiment-golang/app/database/models"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -37,7 +38,7 @@ func InitDatabase() (*gorm.DB, error) {
 
 	// Auto migrate
 	err = db.AutoMigrate(
-	// &models.User{},
+		&models.User{},
 	)
 
 	if err != nil {

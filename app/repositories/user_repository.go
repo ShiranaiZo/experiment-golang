@@ -1,13 +1,17 @@
 package repositories
 
-import "gorm.io/gorm"
+import (
+	"github.com/ShiranaiZo/experiment-golang/app/database/models"
+	"github.com/sirupsen/logrus"
+	"gorm.io/gorm"
+)
 
 type UserRepository struct {
 	db *gorm.DB
 }
 
 type IUserRepository interface {
-	Create(gorm.DB)
+	Create(*models.User) error
 }
 
 func NewUserRepository(db *gorm.DB) IUserRepository {
@@ -16,6 +20,12 @@ func NewUserRepository(db *gorm.DB) IUserRepository {
 	}
 }
 
-func (ur UserRepository) Create(db gorm.DB) {
+func (ur UserRepository) Create(user *models.User) error {
+	err := ur.db.Create(&user).Error
 
+	if err != nil {
+		logrus.Errorf("Failed to create user on repository: %v", err)
+	}
+
+	return err
 }

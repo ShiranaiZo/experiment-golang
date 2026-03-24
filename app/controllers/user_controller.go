@@ -1,8 +1,13 @@
 package controllers
 
 import (
+	"net/http"
+
+	"github.com/ShiranaiZo/experiment-golang/app/database/dto"
 	"github.com/ShiranaiZo/experiment-golang/app/services"
+	"github.com/ShiranaiZo/experiment-golang/helpers"
 	"github.com/gin-gonic/gin"
+	"github.com/sirupsen/logrus"
 )
 
 type UserController struct {
@@ -26,8 +31,51 @@ func NewUserController(service services.IServiceRegistry) IUserController {
 	}
 }
 
-func (c *UserController) CreateUser(ctx *gin.Context) {
+func (c UserController) CreateUser(ctx *gin.Context) {
+	data := dto.UserRequest{}
 
+	err := ctx.ShouldBindJSON(&data)
+	code := http.StatusUnprocessableEntity
+	message := http.StatusText(code)
+
+	if err != nil {
+		logrus.Errorf("Failed to bind JSON on CreateUser controller: %v", err)
+		helpers.HttpResponse(helpers.ParamHTTPResponse{
+			Code:    code,
+			Error:   &err,
+			Message: &message,
+			Ctx:     ctx,
+		})
+
+		return
+	}
+	user, err := c.service.GetUserService().Create(&data)
+
+	if err != nil {
+		logrus.Errorf("Failed to create user on CreateUser controller: %v", err)
+
+		code := http.StatusBadRequest
+		message := http.StatusText(code)
+
+		helpers.HttpResponse(helpers.ParamHTTPResponse{
+			Code:    code,
+			Error:   &err,
+			Message: &message,
+			Ctx:     ctx,
+		})
+
+		return
+	}
+
+	code = http.StatusOK
+	message = http.StatusText(code)
+
+	helpers.HttpResponse(helpers.ParamHTTPResponse{
+		Code:    code,
+		Message: &message,
+		Data:    user,
+		Ctx:     ctx,
+	})
 }
 
 // func (c *UserController) GetUsers(ctx *gin.Context) {
