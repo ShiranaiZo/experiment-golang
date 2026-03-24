@@ -46,8 +46,7 @@ func main() {
 	// Apply the CORS middleware to the router.
 	router.Use(cors.New(corsConfig))
 
-	// Initialize seeders, repositories, services, and controllers.
-	// seeders.NewSeederRegistry(config.DB).Run()
+	// Initialize repositories, services, and controllers.
 	repository := repositories.NewRepositoryRegistry(db)
 	service := services.NewServiceRegistry(repository)
 	controller := controllers.NewControllerRegistry(service)
