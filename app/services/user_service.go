@@ -1,6 +1,8 @@
 package services
 
 import (
+	"fmt"
+
 	"github.com/ShiranaiZo/experiment-golang/app/database/dto"
 	"github.com/ShiranaiZo/experiment-golang/app/database/models"
 	"github.com/ShiranaiZo/experiment-golang/app/repositories"
@@ -15,6 +17,7 @@ type UserService struct {
 type IUserService interface {
 	Create(*dto.UserRequest) (dto.UserResponse, error)
 	Index() ([]dto.UserResponse, error)
+	Show(string) (dto.UserResponse, error)
 }
 
 func NewUserService(repository repositories.IRepositoryRegistry) IUserService {
@@ -25,7 +28,7 @@ func NewUserService(repository repositories.IRepositoryRegistry) IUserService {
 
 func (s UserService) Create(data *dto.UserRequest) (dto.UserResponse, error) {
 	user := models.User{
-		UserID:   ulid.Make(),
+		UserID:   ulid.Make().String(),
 		Name:     data.Name,
 		Address:  data.Address,
 		Email:    data.Email,
@@ -69,4 +72,24 @@ func (s UserService) Index() ([]dto.UserResponse, error) {
 	}
 
 	return data, err
+}
+
+func (s UserService) Show(userId string) (dto.UserResponse, error) {
+	user := models.User{}
+
+	err := s.repository.GetUserRepository().GetUserById(&user, userId)
+
+	fmt.Println(user.Name, "halo")
+
+	return dto.UserResponse{
+		UserId: user.UserID,
+		UserRequest: dto.UserRequest{
+			Name:    user.Name,
+			Address: user.Address,
+			Email:   user.Email,
+		},
+		CreatedAt: user.CreatedAt,
+		UpdatedAt: user.UpdatedAt,
+		DeletedAt: user.DeletedAt,
+	}, err
 }

@@ -15,15 +15,9 @@ type UserController struct {
 }
 
 type IUserController interface {
-	// List method controller
-	// Login(*gin.Context)
-	// Logout(*gin.Context)
 	CreateUser(*gin.Context)
 	GetUsers(*gin.Context)
-	// GetUsers(*gin.Context)
-	// GetUser(*gin.Context, string)
-	// EditUser(*gin.Context, string)
-	// DeleteUser(*gin.Context, string)
+	GetUser(*gin.Context)
 }
 
 func NewUserController(service services.IServiceRegistry) IUserController {
@@ -109,9 +103,34 @@ func (c *UserController) GetUsers(ctx *gin.Context) {
 	)
 }
 
-// func (c *UserController) GetUser(ctx *gin.Context, id string) {
+func (c *UserController) GetUser(ctx *gin.Context) {
+	userId := ctx.Param("userId")
+	user, err := c.service.GetUserService().Show(userId)
 
-// }
+	code := http.StatusBadRequest
+	message := http.StatusText(code)
+
+	if err != nil {
+		helpers.HttpResponse(helpers.ParamHTTPResponse{
+			Code:    code,
+			Error:   &err,
+			Message: &message,
+			Ctx:     ctx,
+		})
+
+		return
+	}
+
+	code = http.StatusOK
+	message = http.StatusText(code)
+
+	helpers.HttpResponse(helpers.ParamHTTPResponse{
+		Code:    code,
+		Message: &message,
+		Data:    user,
+		Ctx:     ctx,
+	})
+}
 
 // func (c *UserController) EditUser(ctx *gin.Context, id string) {
 

@@ -2,12 +2,10 @@ package dto
 
 import (
 	"time"
-
-	"github.com/oklog/ulid/v2"
 )
 
 type UserResponse struct {
-	UserId ulid.ULID `json:"user_id"`
+	UserId string `json:"user_id"`
 	UserRequest
 	CreatedAt time.Time  `json:"created_at"`
 	UpdatedAt time.Time  `json:"updated_at"`
